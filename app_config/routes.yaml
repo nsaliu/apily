@@ -1,0 +1,9 @@
+route2:
+    path: /test
+    controller: HelloWorldAction::test
+    methods: GET
+
+route1:
+    path: /
+    controller: HelloWorldAction
+    methods: GET

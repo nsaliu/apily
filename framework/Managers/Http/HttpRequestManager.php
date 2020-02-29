@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Managers\Http;
+namespace Nazca\Managers\Http;
 
-use App\Managers\Endpoints\EndpointInvocatorInterface;
+use Nazca\Managers\Endpoints\EndpointInvocatorInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,9 +25,12 @@ final class HttpRequestManager implements HttpRequestManagerInterface
     private $endpointInvocator;
 
     public function __construct(
+        ContainerInterface $container,
         EndpointInvocatorInterface $endpointInvocator
     ) {
         $this->request = Request::createFromGlobals();
+
+        $container->set(Request::class, $this->request);
 
         $this->endpointInvocator = $endpointInvocator;
         $this->endpointInvocator->setRequest($this->request);

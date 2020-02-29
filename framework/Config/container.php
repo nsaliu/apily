@@ -1,11 +1,14 @@
 <?php
 
-use App\Managers\Endpoints\EndpointInvocator;
-use App\Managers\Endpoints\EndpointInvocatorInterface;
-use App\Managers\Http\HttpRequestManager;
-use App\Managers\Http\HttpRequestManagerInterface;
+use Nazca\Managers\Endpoints\EndpointInvocator;
+use Nazca\Managers\Endpoints\EndpointInvocatorInterface;
+use Nazca\Managers\Http\HttpRequestManager;
+use Nazca\Managers\Http\HttpRequestManagerInterface;
+use Psr\Container\ContainerInterface;
 
 return [
+
+    ContainerInterface::class => DI\Container::class,
 
     EndpointInvocatorInterface::class => DI\get(EndpointInvocator::class),
 

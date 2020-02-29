@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Managers\Endpoints;
+namespace Nazca\Managers\Endpoints;
 
-use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Managers\Http;
+namespace Nazca\Managers\Http;
 
 use Symfony\Component\HttpFoundation\Response;
 
