@@ -2,12 +2,9 @@
 
 namespace Nazca\Managers\Endpoints;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Psr\Http\Message\ResponseInterface;
 
 interface EndpointInvocatorInterface
 {
-    public function setRequest(Request $request): void;
-
-    public function invoke(): Response;
+    public function invoke(): ResponseInterface;
 }

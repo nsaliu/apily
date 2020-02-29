@@ -7,8 +7,8 @@ use Nazca\Exceptions\Manager\Route\MissingActionDefinitionInRouteException;
 use Nazca\Exceptions\Manager\Route\MissingControllerInRouteDefinitionException;
 use Nazca\Exceptions\Validator\HttpMethodNotSupportedException;
 use Nazca\Managers\Routes\RouteManager;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\Routing\Route;
 
 final class EndpointInvocator implements EndpointInvocatorInterface
@@ -19,33 +19,29 @@ final class EndpointInvocator implements EndpointInvocatorInterface
     private $routeManager;
 
     /**
-     * @var Request
+     * @var ServerRequestInterface
      */
     private $request;
 
     public function __construct(
+        ServerRequestInterface $request,
         RouteManager $routeManager
     ) {
+        $this->request = $request;
         $this->routeManager = $routeManager;
     }
 
-    public function setRequest(Request $request): void
-    {
-        $this->request = $request;
-    }
-
     /**
-     * @return Response
      * @throws ActionClassNotFoundException
      * @throws MissingControllerInRouteDefinitionException
      * @throws MissingActionDefinitionInRouteException
      * @throws HttpMethodNotSupportedException
      */
-    public function invoke(): Response
+    public function invoke(): ResponseInterface
     {
         /** @var Route $route */
         foreach ($this->routeManager->getRoutes() as $routeName => $route) {
-            if (!$this->routeManager->isCurrentPath($this->request->getPathInfo())) {
+            if (!$this->routeManager->isCurrentPath($this->request->getUri()->getPath())) {
                 continue;
             }
 
@@ -68,7 +64,7 @@ final class EndpointInvocator implements EndpointInvocatorInterface
             return $actionClassInstance();
         }
 
-        $pathInfo = $this->request->getPathInfo();
+        $pathInfo = $this->request->getUri()->getPath();
         throw new \Exception("No route found for path {'$pathInfo'}");
     }
 }

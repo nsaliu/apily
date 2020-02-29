@@ -2,17 +2,20 @@
 
 namespace App\Application\Api;
 
-use Symfony\Component\HttpFoundation\Response;
+
+use Laminas\Diactoros\Response\JsonResponse;
 
 class HelloWorldAction
 {
     public function __invoke()
     {
-        return new Response('route / in controller invoke!');
+        return new JsonResponse('route / in controller invoke!');
     }
 
     public function test()
     {
-        return new Response('in /test in controller test!');
+        return new JsonResponse(['asd' => 'in /test in controller test!'], 200, [
+            'Content-Type' => [ 'application/json' ]
+        ]);
     }
 }

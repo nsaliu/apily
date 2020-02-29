@@ -2,14 +2,14 @@
 
 namespace Nazca\Validators;
 
+use Laminas\Diactoros\ServerRequest;
 use Nazca\Exceptions\Validator\HttpMethodNotSupportedException;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 class RouteValidator
 {
     /**
-     * @var Request
+     * @var ServerRequest
      */
     private $request;
 
@@ -19,7 +19,7 @@ class RouteValidator
     private $route;
 
     public function __construct(
-        Request $request
+        ServerRequest $request
     ) {
         $this->request = $request;
     }
@@ -31,7 +31,7 @@ class RouteValidator
     {
         $this->route = $route;
 
-        $this->validateHttpMethod($route);
+        $this->validateHttpMethod();
     }
 
     /**
@@ -41,7 +41,7 @@ class RouteValidator
     {
         if (!in_array($this->request->getMethod(), $this->getAvailableMethods())) {
             throw new HttpMethodNotSupportedException(
-                $this->request->getPathInfo()
+                $this->request->getUri()->getPath()
             );
         }
     }

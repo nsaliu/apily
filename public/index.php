@@ -1,6 +1,6 @@
 <?php
 
-$start = microtime(true);
+//$start = microtime(true);
 
 require __DIR__.'/../vendor/autoload.php';
 
@@ -17,6 +17,6 @@ $httpManager->handleRequest();
 $httpManager->sendResponse();
 $httpManager->end();
 
-$end = microtime(true);
+//$end = microtime(true);
 
-echo "<hr><br/>The code took " . ($end - $start) . " seconds to complete.";
+//echo "<hr><br/>The code took " . ($end - $start) . " seconds to complete.";

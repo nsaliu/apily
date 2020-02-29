@@ -14,9 +14,9 @@ final class ContainerFactory
 
         $builder->useAutowiring(true);
 
-        $builder->enableCompilation(
-            self::getContainerCacheDirectoryPath()
-        );
+//        $builder->enableCompilation(
+//            self::getContainerCacheDirectoryPath()
+//        );
 
         $builder->addDefinitions(
             self::retrieveDependencyInjectionConfiguration()

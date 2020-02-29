@@ -2,15 +2,18 @@
 
 namespace Nazca\Managers\Http;
 
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\ServerRequest;
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
 use Nazca\Managers\Endpoints\EndpointInvocatorInterface;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Psr\Http\Message\ServerRequestInterface;
 
 final class HttpRequestManager implements HttpRequestManagerInterface
 {
     /**
-     * @var Request
+     * @var ServerRequestInterface
      */
     private $request;
 
@@ -20,30 +23,41 @@ final class HttpRequestManager implements HttpRequestManagerInterface
     private $response;
 
     /**
-     * @var EndpointInvocatorInterface
+     * @var ContainerInterface
      */
-    private $endpointInvocator;
+    private $container;
+
+    /**
+     * @var EmitterInterface
+     */
+    private $emitter;
 
     public function __construct(
         ContainerInterface $container,
-        EndpointInvocatorInterface $endpointInvocator
+        EmitterInterface $emitter
     ) {
-        $this->request = Request::createFromGlobals();
+        $this->container = $container;
+        $this->emitter = $emitter;
 
-        $container->set(Request::class, $this->request);
+        $this->request = ServerRequestFactory::fromGlobals();
 
-        $this->endpointInvocator = $endpointInvocator;
-        $this->endpointInvocator->setRequest($this->request);
+        $this->container->set(
+            ServerRequest::class,
+            $this->request
+        );
     }
 
     public function handleRequest(): void
     {
-        $this->response = $this->endpointInvocator->invoke();
+        /** @var EndpointInvocatorInterface $endpointInvocator */
+        $endpointInvocator = $this->container->get(EndpointInvocatorInterface::class);
+
+        $this->response = $endpointInvocator->invoke();
     }
 
-    public function sendResponse(): Response
+    public function sendResponse(): void
     {
-        return $this->response->send();
+        $this->emitter->emit($this->response);
     }
 
     public function end(): void
