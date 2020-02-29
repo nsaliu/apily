@@ -1,0 +1,4 @@
+route1:
+    path: /
+    controller: TestController::test
+    methods: GET
