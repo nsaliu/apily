@@ -28,10 +28,7 @@ app:
       compilation_enabled: false
 
       # mandatory - DIC configuration file
-      configuration_directory_path: app_config
-
-      # mandatory - DIC configuration file
-      configuration_file_path: dic_container.php
+      configuration_directory_path: app_config/container
 
       # mandatory - the directory where DIC store it's compiled output
       compilation_directory: app_data/_private/cache/container

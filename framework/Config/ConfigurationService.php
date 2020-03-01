@@ -19,7 +19,6 @@ class ConfigurationService implements ConfigurationServiceInterface
         ConfigEnum::DIC_COMPILATION_ENABLED,
         ConfigEnum::DIC_COMPILATION_DIRECTORY,
         ConfigEnum::DIC_CONFIGURATION_DIRECTORY_PATH,
-        ConfigEnum::DIC_CONFIGURATION_FILE_PATH,
     ];
 
     /**
@@ -34,14 +33,20 @@ class ConfigurationService implements ConfigurationServiceInterface
      */
     public function __construct()
     {
-        $contents = file_get_contents(__DIR__ . self::CONFIG_FILE_PATH);
+        $configurationFilePath = __DIR__ . self::CONFIG_FILE_PATH;
+
+        if (!file_exists($configurationFilePath)) {
+            throw new CannotFindConfigurationApplicationFileException();
+        }
+
+        $contents = file_get_contents($configurationFilePath);
 
         if ($contents === false) {
             throw new CannotFindConfigurationApplicationFileException();
         }
 
         $this->configuration = Yaml::parse(
-            file_get_contents(__DIR__ . self::CONFIG_FILE_PATH)
+            file_get_contents($configurationFilePath)
         );
 
         if (empty($this->configuration)) {

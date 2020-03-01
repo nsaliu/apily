@@ -14,9 +14,13 @@ use Nazca\Managers\Routes\RouteManagerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+/*
+ * This file contains framework specific configuration for Dependency injection container.
+ */
+
 return [
 
-    # >>> framework settings
+    // >>> framework settings
 
     ContainerInterface::class => DI\Container::class,
 
@@ -32,9 +36,6 @@ return [
 
     HttpRequestManagerInterface::class => DI\get(HttpRequestManager::class),
 
-    # <<< framework settings
+    // <<< framework settings
 
-    # >>> custom settings
-    # ...
-    # <<< custom settings
 ];

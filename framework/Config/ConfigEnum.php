@@ -19,6 +19,4 @@ final class ConfigEnum
     public const DIC_COMPILATION_DIRECTORY = 'app.config.dependency_injection_container.compilation_directory';
 
     public const DIC_CONFIGURATION_DIRECTORY_PATH = 'app.config.dependency_injection_container.configuration_directory_path';
-
-    public const DIC_CONFIGURATION_FILE_PATH = 'app.config.dependency_injection_container.configuration_file_path';
 }
