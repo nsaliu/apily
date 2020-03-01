@@ -16,6 +16,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 return [
 
+    # >>> framework settings
+
     ContainerInterface::class => DI\Container::class,
 
     ConfigurationServiceInterface::class => DI\get(ConfigurationService::class),
@@ -29,4 +31,10 @@ return [
     RouteManagerInterface::class => DI\get(RouteManager::class),
 
     HttpRequestManagerInterface::class => DI\get(HttpRequestManager::class),
+
+    # <<< framework settings
+
+    # >>> custom settings
+    # ...
+    # <<< custom settings
 ];

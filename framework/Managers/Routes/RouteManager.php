@@ -2,6 +2,8 @@
 
 namespace Nazca\Managers\Routes;
 
+use Nazca\Config\ConfigEnum;
+use Nazca\Config\ConfigurationServiceInterface;
 use Nazca\Exceptions\Manager\Route\MissingActionDefinitionInRouteException;
 use Nazca\Exceptions\Manager\Route\MissingControllerInRouteDefinitionException;
 use Nazca\Exceptions\Validator\HttpMethodNotSupportedException;
@@ -11,11 +13,17 @@ use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-final class RouteManager
+final class RouteManager implements RouteManagerInterface
 {
-    private const ROUTE_FILE_DIR = '/../../../app_config/';
+    /**
+     * @var ConfigurationServiceInterface
+     */
+    private $configurationService;
 
-    private const ROUTE_FILE_NAME = 'routes.yaml';
+    /**
+     * @var RouteValidator
+     */
+    private $routeValidator;
 
     /**
      * @var RouteCollection
@@ -25,31 +33,20 @@ final class RouteManager
     /**
      * @var \Iterator
      */
-    private $routeCollectionIterator;
-
-    /**
-     * @var RouteValidator
-     */
-    private $routeValidator;
+    private $routeIterator;
 
     public function __construct(
+        ConfigurationServiceInterface $configurationService,
         RouteValidator $routeValidator
     ) {
-        $this->loadRoutes();
+        $this->configurationService = $configurationService;
         $this->routeValidator = $routeValidator;
+        $this->loadRoutes();
     }
 
     public function getRoutes(): \Iterator
     {
-        return $this->routeCollectionIterator;
-    }
-
-    private function loadRoutes(): void
-    {
-        $fileLocator = new FileLocator([__DIR__ . SELF::ROUTE_FILE_DIR]);
-        $loader = new YamlFileLoader($fileLocator);
-        $this->routeCollection = $loader->load(SELF::ROUTE_FILE_NAME);
-        $this->routeCollectionIterator = $this->routeCollection->getIterator();
+        return $this->routeIterator;
     }
 
     /**
@@ -58,14 +55,14 @@ final class RouteManager
     public function validate(): void
     {
         $this->routeValidator->validate(
-            $this->routeCollectionIterator->current()
+            $this->routeIterator->current()
         );
     }
 
     public function isCurrentPath(string $currentPath): bool
     {
         /** @var Route $currentRoute */
-        $currentRoute = $this->routeCollectionIterator->current();
+        $currentRoute = $this->routeIterator->current();
 
         return $currentPath === $currentRoute->getPath();
     }
@@ -74,7 +71,7 @@ final class RouteManager
      * @throws MissingControllerInRouteDefinitionException
      * @throws MissingActionDefinitionInRouteException
      */
-    public function getAction(): ?string
+    public function getActionClass(): ?string
     {
         return $this->extractActionOrMethodName('action');
     }
@@ -83,9 +80,27 @@ final class RouteManager
      * @throws MissingControllerInRouteDefinitionException
      * @throws MissingActionDefinitionInRouteException
      */
-    public function getMethod(): ?string
+    public function getActionMethod(): ?string
     {
         return $this->extractActionOrMethodName('method');
+    }
+
+    private function loadRoutes(): void
+    {
+        $fileLocator = new FileLocator([
+            sprintf('%s/../../../%s',
+                __DIR__,
+                $this->configurationService->get(ConfigEnum::ROUTES_DIRECTORY_PATH)
+            )
+        ]);
+
+        $loader = new YamlFileLoader($fileLocator);
+
+        $this->routeCollection = $loader->load(
+            $this->configurationService->get(ConfigEnum::ROUTES_FILE_NAME)
+        );
+
+        $this->routeIterator = $this->routeCollection->getIterator();
     }
 
     /**
@@ -94,11 +109,11 @@ final class RouteManager
      */
     private function extractActionOrMethodName(string $subject): ?string
     {
-        $route = $this->routeCollectionIterator->current();
+        $route = $this->routeIterator->current();
 
         if ($route->getDefault('_controller') === null) {
             throw new MissingControllerInRouteDefinitionException(
-                $this->routeCollectionIterator->key()
+                $this->routeIterator->key()
             );
         }
 
@@ -119,18 +134,26 @@ final class RouteManager
     private function extractAction(Route $route): string
     {
         if (strpos($route->getDefault('_controller'), '::') === false) {
-            return 'App\Application\Api\\' . $route->getDefault('_controller');
+            return sprintf(
+                '%s\%s',
+                $this->configurationService->get(ConfigEnum::ACTIONS_NAMESPACE),
+                $route->getDefault('_controller')
+            );
         }
 
         $actionInfo = explode('::', $route->getDefault('_controller'));
 
         if (mb_strlen($actionInfo[0]) === 0) {
             throw new MissingActionDefinitionInRouteException(
-                $this->routeCollectionIterator->key()
+                $this->routeIterator->key()
             );
         }
 
-        return 'App\Application\Api\\' . $actionInfo[0];
+        return sprintf(
+            '%s\%s',
+            $this->configurationService->get(ConfigEnum::ACTIONS_NAMESPACE),
+            $actionInfo[0]
+        );
     }
 
     private function extractMethod(Route $route): ?string

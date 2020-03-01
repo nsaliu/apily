@@ -1,0 +1,38 @@
+app:
+
+  # application configuration
+  config:
+
+    # mandatory - enable when in development mode
+    debug: false
+
+    # mandatory - namespace where Actions (controllers) are placed
+    actions_namespace: App\Application\Api
+
+    # mandatory - application cache directory path
+    cache_directory_path: app_data/_private/cache/
+
+    # mandatory - routes file path
+    routes:
+
+      # mandatory - routes directory path
+      directory: app_config/
+
+      # mandatory - routes file name
+      file: routes.yaml
+
+    # mandatory - DIC configuration
+    dependency_injection_container:
+
+      # mandatory - enable or disable dependency injection container compilation (set to 'true' in production)
+      compilation_enabled: false
+
+      # mandatory - DIC configuration file
+      configuration_directory_path: app_config
+
+      # mandatory - DIC configuration file
+      configuration_file_path: dic_container.php
+
+      # mandatory - the directory where DIC store it's compiled output
+      compilation_directory: app_data/_private/cache/container
+

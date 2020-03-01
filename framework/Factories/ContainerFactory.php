@@ -3,23 +3,31 @@
 namespace Nazca\Factories;
 
 use DI\ContainerBuilder;
+use Nazca\Config\ConfigurationService;
+use Nazca\Config\ConfigurationServiceInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Routing\Loader\PhpFileLoader;
 
 final class ContainerFactory
 {
-    public static function createDependencyInjectionContainer(): ContainerInterface
+    public static function createDependencyInjectionContainer(
+        ConfigurationServiceInterface $configurationService
+    ): ContainerInterface
     {
         $builder = new ContainerBuilder();
 
         $builder->useAutowiring(true);
 
-//        $builder->enableCompilation(
-//            self::getContainerCacheDirectoryPath()
-//        );
+        /** @var ConfigurationService $configurationService */
+        if ($configurationService->getDICCompilationEnabled()) {
+            $builder->enableCompilation(
+                __DIR__ . '/../../' . $configurationService->getDICCompilationDirectory()
+            );
+        }
 
         $builder->addDefinitions(
-            self::retrieveDependencyInjectionConfiguration()
+            self::retrieveDependencyInjectionConfiguration($configurationService)
         );
 
         return $builder->build();
@@ -28,14 +36,12 @@ final class ContainerFactory
     /**
      * @return mixed
      */
-    private static function retrieveDependencyInjectionConfiguration()
+    private static function retrieveDependencyInjectionConfiguration(
+        ConfigurationServiceInterface $configurationService
+    )
     {
-        $fileLocator = new FileLocator([__DIR__ . '/../Config']);
-        return include $fileLocator->locate('container.php');
-    }
-
-    private static function getContainerCacheDirectoryPath(): string
-    {
-        return __DIR__ . '/../../app_data/_private/cache/container';
+        /** @var ConfigurationService $configurationService */
+        $fileLocator = new FileLocator([__DIR__ . '/../../' . $configurationService->getDICConfigurationDirectoryPath()]);
+        return require $fileLocator->locate($configurationService->getDICConfigurationFilePath());
     }
 }

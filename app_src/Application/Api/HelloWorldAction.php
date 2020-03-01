@@ -2,7 +2,6 @@
 
 namespace App\Application\Api;
 
-
 use Laminas\Diactoros\Response\JsonResponse;
 
 class HelloWorldAction

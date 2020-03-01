@@ -4,15 +4,19 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
+use Nazca\Factories\ConfigurationServiceFactory;
 use Nazca\Factories\ContainerFactory;
 use Nazca\Managers\Http\HttpRequestManagerInterface;
 use Psr\Container\ContainerInterface;
 
+$configuration = ConfigurationServiceFactory::createConfigurationService();
+
 /** @var ContainerInterface $container */
-$container = ContainerFactory::createDependencyInjectionContainer();
+$container = ContainerFactory::createDependencyInjectionContainer($configuration);
 
 /** @var HttpRequestManagerInterface $httpManager */
 $httpManager = $container->get(HttpRequestManagerInterface::class);
+
 $httpManager->handleRequest();
 $httpManager->sendResponse();
 $httpManager->end();

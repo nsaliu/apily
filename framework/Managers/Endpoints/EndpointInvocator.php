@@ -3,10 +3,13 @@
 namespace Nazca\Managers\Endpoints;
 
 use Nazca\Exceptions\Manager\Endpoint\ActionClassNotFoundException;
+use Nazca\Exceptions\Manager\Endpoint\ActionMethodNotFoundException;
+use Nazca\Exceptions\Manager\Endpoint\RouteNotFoundException;
 use Nazca\Exceptions\Manager\Route\MissingActionDefinitionInRouteException;
 use Nazca\Exceptions\Manager\Route\MissingControllerInRouteDefinitionException;
 use Nazca\Exceptions\Validator\HttpMethodNotSupportedException;
 use Nazca\Managers\Routes\RouteManager;
+use Nazca\Managers\Routes\RouteManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\Routing\Route;
@@ -25,7 +28,7 @@ final class EndpointInvocator implements EndpointInvocatorInterface
 
     public function __construct(
         ServerRequestInterface $request,
-        RouteManager $routeManager
+        RouteManagerInterface $routeManager
     ) {
         $this->request = $request;
         $this->routeManager = $routeManager;
@@ -33,9 +36,11 @@ final class EndpointInvocator implements EndpointInvocatorInterface
 
     /**
      * @throws ActionClassNotFoundException
+     * @throws ActionMethodNotFoundException
      * @throws MissingControllerInRouteDefinitionException
      * @throws MissingActionDefinitionInRouteException
      * @throws HttpMethodNotSupportedException
+     * @throws RouteNotFoundException
      */
     public function invoke(): ResponseInterface
     {
@@ -47,7 +52,7 @@ final class EndpointInvocator implements EndpointInvocatorInterface
 
             $this->routeManager->validate();
 
-            $actionClass = $this->routeManager->getAction();
+            $actionClass = $this->routeManager->getActionClass();
 
             if (!class_exists($actionClass)) {
                 throw new ActionClassNotFoundException($actionClass);
@@ -55,16 +60,22 @@ final class EndpointInvocator implements EndpointInvocatorInterface
 
             $actionClassInstance = new $actionClass;
 
-            $actionMethod = $this->routeManager->getMethod();
+            $actionMethod = $this->routeManager->getActionMethod();
 
             if ($actionMethod !== null) {
+
+                if (!method_exists($actionClassInstance, $actionMethod)) {
+                    throw new ActionMethodNotFoundException($actionMethod, $actionClass);
+                }
+
                 return $actionClassInstance->{$actionMethod}();
             }
 
             return $actionClassInstance();
         }
 
-        $pathInfo = $this->request->getUri()->getPath();
-        throw new \Exception("No route found for path {'$pathInfo'}");
+        throw new RouteNotFoundException(
+            $this->request->getUri()->getPath()
+        );
     }
 }
