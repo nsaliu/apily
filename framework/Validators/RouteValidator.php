@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Nazca\Validators;
 
 use Laminas\Diactoros\ServerRequest;
@@ -40,9 +42,7 @@ class RouteValidator
     private function validateHttpMethod(): void
     {
         if (!in_array($this->request->getMethod(), $this->getAvailableMethods())) {
-            throw new HttpMethodNotSupportedException(
-                $this->request->getUri()->getPath()
-            );
+            throw new HttpMethodNotSupportedException($this->request->getUri()->getPath());
         }
     }
 

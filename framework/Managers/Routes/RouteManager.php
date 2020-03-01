@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Nazca\Managers\Routes;
 
 use Nazca\Config\ConfigEnum;
@@ -91,7 +93,7 @@ final class RouteManager implements RouteManagerInterface
             sprintf('%s/../../../%s',
                 __DIR__,
                 $this->configurationService->get(ConfigEnum::ROUTES_DIRECTORY_PATH)
-            )
+            ),
         ]);
 
         $loader = new YamlFileLoader($fileLocator);
@@ -111,17 +113,15 @@ final class RouteManager implements RouteManagerInterface
     {
         $route = $this->routeIterator->current();
 
-        if ($route->getDefault('_controller') === null) {
-            throw new MissingControllerInRouteDefinitionException(
-                $this->routeIterator->key()
-            );
+        if (null === $route->getDefault('_controller')) {
+            throw new MissingControllerInRouteDefinitionException($this->routeIterator->key());
         }
 
-        if ($subject === 'action') {
+        if ('action' === $subject) {
             return $this->extractAction($route);
         }
 
-        if ($subject === 'method') {
+        if ('method' === $subject) {
             return $this->extractMethod($route);
         }
 
@@ -133,7 +133,7 @@ final class RouteManager implements RouteManagerInterface
      */
     private function extractAction(Route $route): string
     {
-        if (strpos($route->getDefault('_controller'), '::') === false) {
+        if (false === strpos($route->getDefault('_controller'), '::')) {
             return sprintf(
                 '%s\%s',
                 $this->configurationService->get(ConfigEnum::ACTIONS_NAMESPACE),
@@ -143,10 +143,8 @@ final class RouteManager implements RouteManagerInterface
 
         $actionInfo = explode('::', $route->getDefault('_controller'));
 
-        if (mb_strlen($actionInfo[0]) === 0) {
-            throw new MissingActionDefinitionInRouteException(
-                $this->routeIterator->key()
-            );
+        if (0 === mb_strlen($actionInfo[0])) {
+            throw new MissingActionDefinitionInRouteException($this->routeIterator->key());
         }
 
         return sprintf(
@@ -158,13 +156,13 @@ final class RouteManager implements RouteManagerInterface
 
     private function extractMethod(Route $route): ?string
     {
-        if (strpos($route->getDefault('_controller'), '::') === false) {
+        if (false === strpos($route->getDefault('_controller'), '::')) {
             return null;
         }
 
         $actionInfo = explode('::', $route->getDefault('_controller'));
 
-        if (mb_strlen($actionInfo[1]) === 0) {
+        if (0 === mb_strlen($actionInfo[1])) {
             return null;
         }
 

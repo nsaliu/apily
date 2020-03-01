@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 //$start = microtime(true);
 
 require __DIR__.'/../vendor/autoload.php';

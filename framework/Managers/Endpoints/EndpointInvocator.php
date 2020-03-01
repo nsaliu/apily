@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Nazca\Managers\Endpoints;
 
 use Nazca\Exceptions\Manager\Endpoint\ActionClassNotFoundException;
@@ -58,12 +60,11 @@ final class EndpointInvocator implements EndpointInvocatorInterface
                 throw new ActionClassNotFoundException($actionClass);
             }
 
-            $actionClassInstance = new $actionClass;
+            $actionClassInstance = new $actionClass();
 
             $actionMethod = $this->routeManager->getActionMethod();
 
-            if ($actionMethod !== null) {
-
+            if (null !== $actionMethod) {
                 if (!method_exists($actionClassInstance, $actionMethod)) {
                     throw new ActionMethodNotFoundException($actionMethod, $actionClass);
                 }
@@ -74,8 +75,6 @@ final class EndpointInvocator implements EndpointInvocatorInterface
             return $actionClassInstance();
         }
 
-        throw new RouteNotFoundException(
-            $this->request->getUri()->getPath()
-        );
+        throw new RouteNotFoundException($this->request->getUri()->getPath());
     }
 }

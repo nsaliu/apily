@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Laminas\Diactoros\ServerRequest;
 use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
@@ -19,7 +21,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 
 return [
-
     // >>> framework settings
 
     ContainerInterface::class => DI\Container::class,
@@ -37,5 +38,4 @@ return [
     HttpRequestManagerInterface::class => DI\get(HttpRequestManager::class),
 
     // <<< framework settings
-
 ];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file contains application specific configuration for Dependency injection container.
  * Here you can override framework services, or put your owns definitions.
@@ -8,9 +10,7 @@
  */
 
 return [
-
     // >>> application settings
 
     // <<< application settings
-
 ];

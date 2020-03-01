@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Nazca\Exceptions\Factory;
 
 use Throwable;
@@ -13,8 +15,6 @@ class ContainerDefinitionMustBeAnArrayException extends \Exception
 
     /**
      * @param mixed $container
-     *
-     * @param Throwable|null $previous
      */
     public function __construct(string $container, $type, $code = 0, Throwable $previous = null)
     {

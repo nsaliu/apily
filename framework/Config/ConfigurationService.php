@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Nazca\Config;
 
 use Nazca\Exceptions\Config\CannotFindConfigurationApplicationFileException;
@@ -33,7 +35,7 @@ class ConfigurationService implements ConfigurationServiceInterface
      */
     public function __construct()
     {
-        $configurationFilePath = __DIR__ . self::CONFIG_FILE_PATH;
+        $configurationFilePath = __DIR__.self::CONFIG_FILE_PATH;
 
         if (!file_exists($configurationFilePath)) {
             throw new CannotFindConfigurationApplicationFileException();
@@ -41,7 +43,7 @@ class ConfigurationService implements ConfigurationServiceInterface
 
         $contents = file_get_contents($configurationFilePath);
 
-        if ($contents === false) {
+        if (false === $contents) {
             throw new CannotFindConfigurationApplicationFileException();
         }
 
@@ -57,9 +59,11 @@ class ConfigurationService implements ConfigurationServiceInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @throws ConfigurationKeyNotFoundException
+     *
+     * @return mixed
      */
     public function get(string $configurationKey)
     {
@@ -127,7 +131,7 @@ class ConfigurationService implements ConfigurationServiceInterface
     private function validateMandatoryFields(): void
     {
         foreach (self::MANDATORY_PARAMS as $param) {
-            if ($this->extractConfigurationValue($this->configuration, $param) === null) {
+            if (null === $this->extractConfigurationValue($this->configuration, $param)) {
                 throw new ConfigurationKeyNotFoundException($param);
             }
         }
@@ -135,6 +139,7 @@ class ConfigurationService implements ConfigurationServiceInterface
 
     /**
      * @param mixed $key
+     *
      * @return mixed
      */
     private function extractConfigurationValue(array $configuration, $key)
@@ -143,9 +148,9 @@ class ConfigurationService implements ConfigurationServiceInterface
             $key = explode('.', $key);
         }
 
-        for ($i = 0; $i < count($key); $i++) {
+        for ($i = 0; $i < count($key); ++$i) {
             if (array_key_exists($key[$i], $configuration)) {
-                if (count($key) === 1) {
+                if (1 === count($key)) {
                     return $configuration[$key[$i]];
                 }
 

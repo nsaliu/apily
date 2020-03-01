@@ -1,0 +1,17 @@
+<?php
+$finder = PhpCsFixer\Finder::create()
+    ->exclude('app_data/')
+    ->in(__DIR__)
+;
+return PhpCsFixer\Config::create()
+    ->setRules([
+        '@PSR2' => true,
+        '@Symfony' => true,
+        'declare_strict_types' => true,
+        'ordered_imports' => true,
+        'phpdoc_order' => true,
+        'phpdoc_var_without_name' => true,
+        'no_superfluous_phpdoc_tags' => ['allow_mixed' => true]
+    ])
+    ->setFinder($finder)
+;

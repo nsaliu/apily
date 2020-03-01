@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\Api;
 
 use Laminas\Diactoros\Response\JsonResponse;
@@ -14,7 +16,7 @@ class HelloWorldAction
     public function test()
     {
         return new JsonResponse(['asd' => 'in /test in controller test!'], 200, [
-            'Content-Type' => [ 'application/json' ]
+            'Content-Type' => ['application/json'],
         ]);
     }
 }
